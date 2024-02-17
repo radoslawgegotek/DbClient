@@ -7,116 +7,11 @@
 #include <odbcinst.h>
 #include <tchar.h>
 #include "QueryBuilder.h"
+#include "MSQLConnection.h"
 
-void extract_error(
-    std::string fn,
-    SQLHANDLE handle,
-    SQLSMALLINT type)
-{
-    SQLINTEGER   i = 0;
-    SQLINTEGER   native;
-    SQLWCHAR      state[7];
-    SQLWCHAR      text[256];
-    SQLSMALLINT  len;
-    SQLRETURN    ret;
-
-    std::cout << "\nThe driver reported the following diagnostics whilst running " << fn << "\n\n";
-
-    do
-    {
-        ret = SQLGetDiagRecW(type, handle, ++i, state, &native, text,
-            sizeof(text), &len);
-        if (SQL_SUCCEEDED(ret))
-        {
-            state[6] = L'\0'; // Ensure null-termination
-            wprintf(L"%ls:%ld:%ld:%ls\n", state, i, native, text);
-        }
-    } while (ret == SQL_SUCCESS);
-
-}
-
-#define TestDb
 
 int main()
 {
-#ifdef TestDb
-
-
-    std::cout << "Program had started.." << std::endl;
-
-    SQLHENV env;
-    SQLHDBC dbc;
-    SQLWCHAR outstr[1024];
-    SQLSMALLINT outstrlen;
-    SQLHSTMT stmt;
-    SQLRETURN queryReturn;
-
-    SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &env);
-    SQLSetEnvAttr(env, SQL_ATTR_ODBC_VERSION, (void*)SQL_OV_ODBC3, 0);
-    SQLAllocHandle(SQL_HANDLE_DBC, env, &dbc);
-
-    SQLRETURN SR;
-
-    std::cout << "Attempting Connection " << std::endl;
-    
-//    SQLWCHAR sqlConnectionString[] = L"Server=DESKTOP-11SJP2F;Database=BazaProjektPipao;Trusted_Connection=True;Trust Server Certificate=true";
-    SQLWCHAR sqlConnectionString[] = L"DRIVER = { ODBC Driver 17 for SQL Server }; SERVER = DESKTOP-11SJP2F; Database = BazaProjektPipao; Trusted_Connection = yes;";
-    
-    SR = SQLDriverConnectW(dbc, NULL, sqlConnectionString, SQL_NTS,
-        outstr, sizeof(outstr), &outstrlen,
-        SQL_DRIVER_NOPROMPT);
-
-    std::cout << "Connecting ... " << std::endl;
-    extract_error("SQLDriverConnect", dbc, SQL_HANDLE_DBC);
-
-    if (SR != SQL_SUCCESS && SR != SQL_SUCCESS_WITH_INFO)
-    {
-        std::cout << "fail to connect" << std::endl;
-    }
-    else
-    {
-        std::cout << "connected" << std::endl;
-        std::cout << "Executing SQL query ..." << std::endl;
-
-        SQLWCHAR query[] = L"SELECT * from Dane";
-        SQLAllocHandle(SQL_HANDLE_STMT, dbc, &stmt);
-
-        queryReturn = SQLExecDirect(stmt, query, SQL_NTS);
-
-        if (SQL_SUCCEEDED(queryReturn)) {
-            // Pobranie wyników z zapytania
-            SQLSMALLINT columns;
-            queryReturn = SQLNumResultCols(stmt, &columns);
-
-            while (SQL_SUCCEEDED(SQLFetch(stmt))) {
-                for (SQLSMALLINT col = 1; col <= columns; ++col) {
-                    SQLWCHAR buffer[256];
-                    SQLLEN indicator;
-
-                    queryReturn = SQLGetData(stmt, col, SQL_C_WCHAR, buffer, sizeof(buffer), &indicator);
-
-                    if (SQL_SUCCEEDED(queryReturn)) {
-                        if (indicator == SQL_NULL_DATA) {
-                            std::wcout << L"NULL";
-                        }
-                        else {
-                            std::wcout << buffer;
-                        }
-                        std::wcout << L"\t";
-                    }
-                }
-                std::wcout << std::endl;
-            }
-        }
-        else {
-            // Obs³uga b³êdu wykonania zapytania
-            extract_error("SQLExecDirect", stmt, SQL_HANDLE_STMT);
-        }
-        SQLFreeHandle(SQL_HANDLE_STMT, stmt);
-        SQLFreeHandle(SQL_HANDLE_DBC, dbc);
-        SQLFreeHandle(SQL_HANDLE_ENV, env);
-    }
-#endif // TestDb
 
     rgmc::SqlQueryBuilder builder;
     //builder.select({ "name"})
