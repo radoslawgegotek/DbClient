@@ -3,8 +3,14 @@
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\QueryBuilder.cpp" />
+    <ClCompile Include="src\ODBCConnection.cpp" />
+    <ClCompile Include="src\MSQLConnection.cpp" />
+    <ClCompile Include="src\QueryResult.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\QueryBuilder.h" />
+    <ClInclude Include="src\ODBCConnection.h" />
+    <ClInclude Include="src\MSQLConnection.h" />
+    <ClInclude Include="src\QueryResult.h" />
   </ItemGroup>
 </Project>

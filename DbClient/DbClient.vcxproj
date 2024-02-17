@@ -19,10 +19,16 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\QueryResult.cpp" />
+    <ClCompile Include="src\MSQLConnection.cpp" />
+    <ClCompile Include="src\ODBCConnection.cpp" />
     <ClCompile Include="src\QueryBuilder.cpp" />
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\QueryResult.h" />
+    <ClInclude Include="src\MSQLConnection.h" />
+    <ClInclude Include="src\ODBCConnection.h" />
     <ClInclude Include="src\QueryBuilder.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
