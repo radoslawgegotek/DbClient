@@ -38,6 +38,9 @@ namespace rgmc
         SortColumn                  m_sortingBy;
         int                         m_topCount;
         bool                        m_isDistinct;
+        std::vector<std::string>    m_setConditionsUpdate;
+        std::vector<std::string>    m_joinConditions;
+        std::vector<std::pair<std::string, std::string>> m_tableColumns;
 
     public:
         SqlQueryBuilder()
@@ -108,6 +111,11 @@ namespace rgmc
                 m_query << " ORDER BY " << m_sortingBy.m_column << (m_sortingBy.m_ascending ? " ASC" : " DESC");
             }
 
+            if (!m_joinConditions.empty())
+            {
+                m_query << " JOIN " << join(m_joinConditions, " ");;
+            }
+
             return m_query.str();
         }
 
@@ -115,6 +123,20 @@ namespace rgmc
         {
             return m_parameters;
         }
+
+        void getQuery();
+        SqlQueryBuilder& createTableArg(const std::vector<std::pair<std::string, std::string>>& columns);
+        SqlQueryBuilder& createTable(const std::string& tableName);
+        SqlQueryBuilder& insert_into(const std::string& tableName, const std::vector<std::string>& columns, const std::vector<std::string>& values);
+        SqlQueryBuilder& update(const std::string& tableName);
+        SqlQueryBuilder& set(const std::string& column, const std::string& value);
+        std::string get_update_query();
+        SqlQueryBuilder& join(const std::string& tableName, const std::string& condition);
+
+        SqlQueryBuilder& alterTable(const std::string& tableName);
+        SqlQueryBuilder& addColumn(const std::string& columnName, const std::string& columnType);
+        SqlQueryBuilder& dropColumn(const std::string& columnName);
+        SqlQueryBuilder& alterColumn(const std::string& columnName, const std::string& newColumnType);
 
     private:
         void add_filter(
@@ -164,6 +186,8 @@ namespace rgmc
             }
             return result;
         }
+
+
     };
 }
 

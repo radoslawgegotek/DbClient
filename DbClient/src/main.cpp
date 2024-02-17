@@ -6,131 +6,7 @@
 #include <sqlext.h>
 #include <odbcinst.h>
 #include <tchar.h>
-
-
 #include "QueryBuilder.h"
-
-//#define IS_SQL_ERR !IS_SQL_OK
-//#define IS_SQL_OK(res) (res == SQL_SUCCESS_WITH_INFO || res == SQL_SUCCESS)
-//#define SAFE_STR(str) ((str == NULL) ? _T("") : str)
-//
-//class ODBCConnection
-//{
-//public:
-//    bool Connect(LPCTSTR svSource)
-//    {
-//        int nConnect = SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &m_hEnv);
-//        if (nConnect == SQL_SUCCESS || nConnect == SQL_SUCCESS_WITH_INFO)
-//        {
-//            nConnect = SQLSetEnvAttr(m_hEnv, SQL_ATTR_ODBC_VERSION, (void*)SQL_OV_ODBC3, 0);
-//            if (nConnect == SQL_SUCCESS || nConnect == SQL_SUCCESS_WITH_INFO)
-//            {
-//                nConnect = SQLAllocHandle(SQL_HANDLE_DBC, m_hEnv, &m_hDBC);
-//                if (nConnect == SQL_SUCCESS || nConnect == SQL_SUCCESS_WITH_INFO)
-//                {
-//                    SQLSetConnectOption(m_hDBC, SQL_LOGIN_TIMEOUT, 5);
-//                    short shortResult = 0;
-//                    SQLTCHAR szOutConnectString[1024];
-//                    nConnect = SQLDriverConnect(m_hDBC, NULL, (SQLTCHAR*)svSource,
-//                        _tcslen(svSource), szOutConnectString,
-//                        sizeof(szOutConnectString), &shortResult,
-//                        SQL_DRIVER_NOPROMPT);
-//                    return IS_SQL_OK(nConnect);
-//                }
-//            }
-//        }
-//        if (m_hDBC != NULL)
-//        {
-//            m_nReturn = SQLDisconnect(m_hDBC);
-//            m_nReturn = SQLFreeHandle(SQL_HANDLE_DBC, m_hDBC);
-//        }
-//        if (m_hEnv != NULL)
-//            m_nReturn = SQLFreeHandle(SQL_HANDLE_ENV, m_hEnv);
-//        m_hDBC = NULL;
-//        m_hEnv = NULL;
-//        m_nReturn = SQL_ERROR;
-//        return (IS_SQL_OK(nConnect));
-//    }
-//    ODBCConnection()
-//    {
-//        m_hDBC = NULL;
-//        m_hEnv = NULL;
-//        m_nReturn = SQL_ERROR;
-//    }
-//    virtual ~ODBCConnection()
-//    {
-//        if (m_hDBC != NULL)
-//        {
-//            m_nReturn = SQLFreeHandle(SQL_HANDLE_DBC, m_hDBC);
-//        }
-//        if (m_hEnv != NULL)
-//            m_nReturn = SQLFreeHandle(SQL_HANDLE_ENV, m_hEnv);
-//    }
-//    void Disconnect()
-//    {
-//        if (m_hDBC != NULL)
-//        {
-//            m_nReturn = SQLDisconnect(m_hDBC);
-//            m_hDBC = NULL;
-//        }
-//    }
-//public:
-//    operator HDBC()
-//    {
-//        return m_hDBC;
-//    }
-//
-//private:
-//    SQLRETURN m_nReturn; // Internal SQL Error code
-//    HENV m_hEnv;        // Handle to environment
-//    HDBC m_hDBC;        // Handle to database connection
-//};
-//
-//class MSSQLConnection : public ODBCConnection
-//{
-//public:
-//    enum enumProtocols
-//    {
-//        protoNamedPipes,
-//        protoWinSock,
-//        protoIPX,
-//        protoBanyan,
-//        protoRPC
-//    };
-//
-//    MSSQLConnection() {}
-//    virtual ~MSSQLConnection() {}
-//    BOOL ConnectWindowsAuth(LPCTSTR Server = _T("(localhost\\SQLEXPRESS)"), LPCTSTR Database = _T("Test"))
-//    {
-//        TCHAR str[512] = _T("");
-//        _stprintf(str, _T("Driver={ODBC Driver 17 for SQL Server};Server=%s;Database=%s;Trusted_Connection=yes;"),
-//            SAFE_STR(Server), SAFE_STR(Database));
-//        return ODBCConnection::Connect(str);
-//    }
-//};
-//
-//int main()
-//{
-//    MSSQLConnection connection;
-//
-//    // Replace 'YourDatabaseName' with the actual database name.
-//    BOOL code = connection.ConnectWindowsAuth();
-//    if (code)
-//    {
-//        std::cout << "Connected successfully!" << std::endl;
-//
-//        // Now you can use the 'connection' object to execute SQL queries.
-//        // ...
-//
-//        connection.Disconnect();
-//    }
-//    else
-//    {
-//        std::cerr << "Connection failed!" << std::endl;
-//    }
-//
-//    return 0;
-//}
 
 void extract_error(
     std::string fn,
@@ -182,7 +58,10 @@ int main()
     SQLRETURN SR;
 
     std::cout << "Attempting Connection " << std::endl;
-    SQLWCHAR sqlConnectionString[] = L"DRIVER={ODBC Driver 17 for SQL Server};SERVER=localhost\\SQLEXPRESS;Database=Test;Trusted_Connection=yes;";
+    
+//    SQLWCHAR sqlConnectionString[] = L"Server=DESKTOP-11SJP2F;Database=BazaProjektPipao;Trusted_Connection=True;Trust Server Certificate=true";
+    SQLWCHAR sqlConnectionString[] = L"DRIVER = { ODBC Driver 17 for SQL Server }; SERVER = DESKTOP-11SJP2F; Database = BazaProjektPipao; Trusted_Connection = yes;";
+    
     SR = SQLDriverConnectW(dbc, NULL, sqlConnectionString, SQL_NTS,
         outstr, sizeof(outstr), &outstrlen,
         SQL_DRIVER_NOPROMPT);
@@ -199,7 +78,7 @@ int main()
         std::cout << "connected" << std::endl;
         std::cout << "Executing SQL query ..." << std::endl;
 
-        SQLWCHAR query[] = L"SELECT * from tasks";
+        SQLWCHAR query[] = L"SELECT * from Dane";
         SQLAllocHandle(SQL_HANDLE_STMT, dbc, &stmt);
 
         queryReturn = SQLExecDirect(stmt, query, SQL_NTS);
@@ -240,15 +119,51 @@ int main()
 #endif // TestDb
 
     rgmc::SqlQueryBuilder builder;
-    builder.select({ "name", "age", "salary" })
-        .from("employees")
-        .where("department", "IT")
-        .where("name", "Marian", rgmc::SqlComparisonOperator::Like)
-        .where("age", 22)
-        .orderBy("age", true);
+    //builder.select({ "name"})
+    //    .from("employees")
+    //    .where("department", "IT")
+    //    .where("name", "Marian", rgmc::SqlComparisonOperator::Like)
+    //    .where("age", 22)
+    //    .orderBy("age", true);
 
-    std::string query = builder.get_select_query();
-    std::cout << query << std::endl;
+    //std::string query = builder.get_select_query();
+    //std::cout << query << std::endl;
+  
 
+                                        //TWORZENIE TABELI
+    //builder.createTableArg({
+    //    {"id", "INT PRIMARY KEY"},
+    //    {"name", "VARCHAR(255)"},
+    //    {"age", "INT"}
+    //    });
+
+    //builder.createTable("new_table");
+    
+                                        //INSERT
+                                        
+
+    //builder.insert_into("new_table", { "kolumna1", "kolumna2" }, { "w1", "w2" });
+
+
+                                        //UPDATE
+    //builder.update("pracownicy").set("stanowisko", "Senior Programista").where("id", 1);
+    //std::cout << builder.get_update_query() << std::endl;
+
+                                        //JOIN
+    //builder.update("pracownicy")
+    //    .set("stanowisko", "Senior Programista")
+    //    .join("dzialy d", "p.dzial_id = d.id")
+    //    .where("id", "1");
+    //std::cout << builder.get_update_query() << std::endl;
+
+    //                                    //AlterTable
+    //builder.alterTable("table_name").addColumn("new_column", "INT");
+    //builder.getQuery();
+    //builder.alterTable("table_name").dropColumn("column_to_drop");
+    //builder.getQuery();
+    //builder.alterTable("table_name").alterColumn("existing_column", "VARCHAR(255)");
+    //builder.getQuery();
+
+    
     return 0;
 }
