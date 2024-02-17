@@ -115,4 +115,5 @@ namespace rgmc
         m_query << " ALTER COLUMN " << columnName << " " << newColumnType;
         return *this;
     }
+
 }
