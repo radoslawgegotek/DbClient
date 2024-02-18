@@ -19,7 +19,7 @@ namespace rgmc
 		virtual ~ODBCConnection();
 		bool open();
 		void close();
-		QueryResult executeQuery(const wchar_t* query);
+		QueryResult executeQuery(std::wstring query);
 
 
 	protected:

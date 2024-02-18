@@ -3,8 +3,8 @@
 namespace rgmc
 {
 
-    void SqlQueryBuilder::getQuery() {
-        std::cout << "Wygenerowany sql: " << m_query.str() << std::endl;
+    std::wstring SqlQueryBuilder::get_query() {
+        return std::wstring_convert<std::codecvt_utf8<wchar_t>>().from_bytes(m_query.str());
     }
 
     SqlQueryBuilder& SqlQueryBuilder::createTableArg(const std::vector<std::pair<std::string, std::string>>& columns)
@@ -41,8 +41,6 @@ namespace rgmc
         m_query << join(values, ", ");
         m_query << ");";
 
-        std::cout << "Wygenerowany SQL: " << m_query.str() << std::endl;
-
         return *this;
     }
     
@@ -67,7 +65,7 @@ namespace rgmc
 
 
 
-    std::string SqlQueryBuilder::get_update_query()
+    std::wstring SqlQueryBuilder::get_update_query()
     {
         if (!m_setConditionsUpdate.empty())
         {
@@ -83,7 +81,7 @@ namespace rgmc
         {
             m_query << " JOIN " << join(m_joinConditions, " ");;
         }
-        return m_query.str();
+        return std::wstring_convert<std::codecvt_utf8<wchar_t>>().from_bytes(m_query.str());
     }
 
     SqlQueryBuilder& SqlQueryBuilder::alterTable(const std::string& tableName)
@@ -133,9 +131,18 @@ namespace rgmc
     SqlQueryBuilder& SqlQueryBuilder::where(
         const std::string& column,
         const std::string& value,
-        SqlComparisonOperator filterOperator = SqlComparisonOperator::Equals)
+        SqlComparisonOperator filterOperator)
     {
         add_filter(column, value, filterOperator);
+        return *this;
+    }
+
+    SqlQueryBuilder& SqlQueryBuilder::where(
+        const std::string& column,
+        int value,
+        SqlComparisonOperator filterOperator)
+    {
+        add_filter(column, std::to_string(value), filterOperator);
         return *this;
     }
 
@@ -145,7 +152,7 @@ namespace rgmc
         return *this;
     }
 
-    std::string SqlQueryBuilder::get_select_query()
+    std::wstring SqlQueryBuilder::get_select_query()
     {
         m_query << "SELECT ";
 
@@ -170,7 +177,7 @@ namespace rgmc
             m_query << " JOIN " << join(m_joinConditions, " ");;
         }
 
-        return m_query.str();
+        return std::wstring_convert<std::codecvt_utf8<wchar_t>>().from_bytes(m_query.str());
     }
 
     const std::vector<std::string>& SqlQueryBuilder::GetParameters() const

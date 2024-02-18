@@ -12,8 +12,23 @@
 
 int main()
 {
+    //rgmc::SqlQueryBuilder builder;
+    //rgmc::MSQLConnection conn(L"localhost\\SQLEXPRESS", L"Test");
 
-    rgmc::SqlQueryBuilder builder;
+    //builder.select({"osoba", "id"})
+    //    .from("tasks")
+    //    .where("id", 5, rgmc::SqlComparisonOperator::GreaterOrEqual)
+    //    .orderBy("osoba", true);
+
+    //std::wstring sql = builder.get_select_query();
+
+    //conn.open();
+
+    //rgmc::QueryResult response = conn.executeQuery(sql);
+    //std::wcout << response;
+
+    //conn.close();
+
     //builder.select({ "name"})
     //    .from("employees")
     //    .where("department", "IT")

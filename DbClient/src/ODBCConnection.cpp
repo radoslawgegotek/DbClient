@@ -94,13 +94,13 @@ bool rgmc::ODBCConnection::open()
 	return m_errorCode == SQL_SUCCESS;
 }
 
-rgmc::QueryResult rgmc::ODBCConnection::executeQuery(const wchar_t* query)
+rgmc::QueryResult rgmc::ODBCConnection::executeQuery(std::wstring query)
 {
 	if (!m_hDbc) throw std::runtime_error("Database connection is not open");
 
 	SQLRETURN retcode;
 
-	retcode = SQLExecDirect(m_hStmt, (SQLWCHAR*)query, SQL_NTS);
+	retcode = SQLExecDirect(m_hStmt, (SQLWCHAR*)query.c_str(), SQL_NTS);
 
 	if (retcode != SQL_SUCCESS && retcode != SQL_SUCCESS_WITH_INFO)
 	{
