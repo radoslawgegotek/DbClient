@@ -26,15 +26,22 @@ namespace rgmc
             }
         }
 
+        if (!m_foreignKeys.empty()) {
+            m_query << ", ";
+            m_query << join(m_foreignKeys, ", ");
+        }
+
         m_query << ");";
 
         m_tableColumns.clear();
+        m_foreignKeys.clear();
 
         return *this;
     }
 
     SqlQueryBuilder& SqlQueryBuilder::insert_into(const std::string& tableName, const std::vector<std::string>& columns, const std::vector<std::string>& values)
     {
+        m_query.str("");
         m_query << "INSERT INTO " << tableName << " (";
         m_query << join(columns, ", ");
         m_query << ") VALUES (";
@@ -109,6 +116,12 @@ namespace rgmc
         return *this;
     }
 
+    SqlQueryBuilder& SqlQueryBuilder::addForeignKey(const std::string& columnName, const std::string& referencedTable, const std::string& referencedColumnName)
+    {
+        std::string foreignKey = "FOREIGN KEY (" + columnName + ") REFERENCES " + referencedTable + "(" + referencedColumnName + ")";
+        m_foreignKeys.push_back(foreignKey);
+        return *this;
+    }
 
     SqlQueryBuilder& SqlQueryBuilder::select(const std::vector<std::string>& columns)
     {

@@ -42,12 +42,12 @@ namespace rgmc
         bool                        m_isDistinct;
         std::vector<std::string>    m_setConditionsUpdate;
         std::vector<std::string>    m_joinConditions;
+        std::vector<std::string>    m_foreignKeys;
         std::vector<std::pair<std::string, std::string>> m_tableColumns;
         void add_filter(
             const std::string& column,
             const std::string& valueToFilter,
             const SqlComparisonOperator filterOperator);
-        void reset();
         std::string join(const std::vector<std::string>& elements, const std::string& delimiter) const;
 
     public:
@@ -57,6 +57,7 @@ namespace rgmc
             reset();
         }
 
+        void reset();
         SqlQueryBuilder& select(const std::vector<std::string>& columns);
         SqlQueryBuilder& select_distinct(const std::vector<std::string>& columns);
         SqlQueryBuilder& from(const std::string& dataSource);
@@ -83,6 +84,7 @@ namespace rgmc
         SqlQueryBuilder& addColumn(const std::string& columnName, const std::string& columnType);
         SqlQueryBuilder& dropColumn(const std::string& columnName);
         SqlQueryBuilder& alterColumn(const std::string& columnName, const std::string& newColumnType);
+        SqlQueryBuilder& addForeignKey(const std::string& columnName, const std::string& referencedTable, const std::string& referencedColumnName);
     };
 }
 
